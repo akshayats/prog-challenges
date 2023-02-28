@@ -17,34 +17,16 @@ def parse_ip(ip):
     return p_t, dg, n
 
 
-# def velocity(pts, t):
-#     bb = np.diff(np.asarray(pts), axis=0) / np.diff(t.astype(float).reshape((-1, 1)), axis=0)
-#     return 0
-
-
 def velocity(a, b):
     dt = float(b[2] - a[2])
     v = tuple([(b[0] - a[0]) / dt, (b[1] - a[1]) / dt])
     return v
 
 
-# def get_gps_pts(dg, v, p, anchor_idxs):
-#     pts = []
-#     for i, dt, pp in zip(anchor_idxs, dg, np.array(p)[anchor_idxs, :]):
-#         q = dt * v[i] + pp
-#         pts.append(tuple(q))
-#     return pts
-
 def get_gps_pt(tg, t, vg, p0):
     dg = float(tg - t)  # delta between gps and most recent t
     p_g = tuple([p0[0] + vg[0] * dg, p0[1] + vg[1] * dg, tg])  # GPS point recorded
     return p_g
-
-#
-# def path_distance(p):
-#     q = np.diff(p, axis=0)
-#     pathdist = np.sum(np.sqrt(np.sum(np.square(q), axis=1)))
-#     return pathdist
 
 
 def l2_dist(p, q):
@@ -82,45 +64,24 @@ def gps_error(p_t, t_g):
     dist_run = path_distance(p_t)
     dist_gps = path_distance(p_g)
     err_percent = (1-dist_gps/dist_run)*100
-    # dg = t_g - t[anchor_idxs]  # delta between gps and most recent t
-    # vg = v[anchor_idxs, :]  # relevant velocity vector
-    # p0 = np.array(p)[anchor_idxs, :]  # relevant local origin
-    # q = p0 + vg * dg[:, np.newaxis]  # GPS point recorded
-    # print(t_g)
-    # print(anchor_idxs)
-    # print(t)
-    # print(v)
-    # print(p_t)
-    # print(p_g)
-    # print('---')
-    # print(dist_run)
-    # print(dist_gps)
-    # print(err_percent)
     return err_percent
-    #
-    # # Percentage distance error
-    # dist_run = path_distance(np.array(p))  # Actual path distance
-    # dist_gps = path_distance(q)  # GPS path distance
-    # err_percent = (1 - dist_gps / dist_run) * 100
-    # # print("Percentage error in distance by GPS = {}%".format(err))
-    # return err_percent
 
 
 def main():
-    ip_phrase = []
-    n = None
-    for line in sys.stdin:
-        ip_num = [int(i) for i in line.split(' ')[0:]]
-        ip_phrase.append(ip_num)
-        if not n:
-            n = ip_num[0]
-            l = 0
-        l += 1
-        if l > n:
-            break
+    # ip_phrase = []
+    # n = None
+    # for line in sys.stdin:
+    #     ip_num = [int(i) for i in line.split(' ')[0:]]
+    #     ip_phrase.append(ip_num)
+    #     if not n:
+    #         n = ip_num[0]
+    #         l = 0
+    #     l += 1
+    #     if l > n:
+    #         break
 
 
-    # ip_phrase = [[6, 2], [0, 0, 0], [0, 3, 3], [-2, 5, 5], [0, 7, 7], [2, 5, 9], [0, 3, 11]]
+    ip_phrase = [[6, 2], [0, 0, 0], [0, 3, 3], [-2, 5, 5], [0, 7, 7], [2, 5, 9], [0, 3, 11]]
 
     # p = [(0, 0), (1, 1), (4, 7), (6, 10), (5, 7), (3, -1), (0, -4), (-2, -1), (-3, 2), (2, 5), (-1, 13)]
     # t = np.arange(0, 32, 3)
