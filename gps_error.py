@@ -1,101 +1,74 @@
 #!/usr/bin/env python3
-
 import sys
 
 
-def parse_ip(ip):
-    n = None  # Num of positions on running path
-    dg = None  # GPS recording time period
-    p_t = None
-    for l in ip:
-        if not (n or dg):
-            n, dg = l  # Assign params
-            p_t = []  # Init points container
-        else:
-            # [xi, yi, ti]
-            p_t.append(tuple(l))
-    return p_t, dg, n
+def get_input():
+    # Read first line
+    # n : Num of positions on running path
+    # T_gps : GPS recording time period
+    n, T_gps = [int(i) for i in input().split(' ')]
+    # Read running data
+    datalist = []
+    for line in sys.stdin:
+        datapoint = [int(i) for i in line.split(' ')[0:]]
+        datalist.append(tuple(datapoint))
+        if len(datalist) >= n:
+            break
+    return T_gps, datalist
 
 
 def velocity(a, b):
     dt = float(b[2] - a[2])
-    v = tuple([(b[0] - a[0]) / dt, (b[1] - a[1]) / dt])
-    return v
+    return tuple([(b[0] - a[0]) / dt, (b[1] - a[1]) / dt])
 
 
-def get_gps_pt(tg, t, vg, p0):
-    dg = float(tg - t)  # delta between gps and most recent t
-    p_g = tuple([p0[0] + vg[0] * dg, p0[1] + vg[1] * dg, tg])  # GPS point recorded
-    return p_g
+def get_gps_pt(t_gps, t_run, vg, p0):
+    dt = float(t_gps - t_run)  # delta between gps and most recent t_run
+    return tuple([p0[0] + vg[0] * dt, p0[1] + vg[1] * dt, t_gps])  # GPS point recorded
 
 
 def l2_dist(p, q):
-    s = ((q[0] - p[0]) ** 2 + (q[1] - p[1]) ** 2) ** 0.5
-    return s
+    return ((q[0] - p[0]) ** 2 + (q[1] - p[1]) ** 2) ** 0.5
 
 
-def path_distance(p):
+def path_distance(points):
     dist = 0
-    for i, j in zip(p[:-1], p[1:]):
-        dist += l2_dist(i, j)
+    for p, q in zip(points[:-1], points[1:]):
+        dist += l2_dist(p, q)
     return dist
 
 
-def gps_error(p_t, t_g):
-    v = list(map(velocity, p_t[:-1], p_t[1:]))  # ds/dt
-    v.append((0, 0))  # Stop velocity at last point
+def gps_error(pts_run, T_gps):
+    # All GPS time stamps
+    t_g = list(range(0, pts_run[-1][-1], T_gps))  # GPS time stamps, start at 0 and ...
+    t_g.append(pts_run[-1][-1])  # end with last t_run
 
-    # Which velocity vector for each t_g
-    t = [i[2] for i in p_t]  # Actual time stamps
-    anchor_idxs = [len(t) - 1 - [i >= j for j in t[::-1]].index(True) for i in t_g]
+    # Velocity vectors at running positions
+    v = list(map(velocity, pts_run[:-1], pts_run[1:]))  # ds/dt
+    v.append((0, 0))  # Stop velocity at final position
 
-    # Find points at GPS times
-    # a = get_gps_pt(t_g[2], t[anchor_idxs[2]], v[anchor_idxs[2]], p_t[anchor_idxs[2]])
+    # Which velocity vector for each t_g?
+    t_run_all = [i[2] for i in pts_run]  # Actual time stamps
+    anchor_idxs = [len(t_run_all) - 1 - [i >= j for j in t_run_all[::-1]].index(True) for i in t_g]
 
-    t_pick = []
-    v_pick = []
-    p_pick = []
+    t_run_ref = []
+    v_seg = []
+    pts_ref = []
     for k in anchor_idxs:
-        t_pick.append(t[k])
-        v_pick.append(v[k])
-        p_pick.append(p_t[k])
+        t_run_ref.append(t_run_all[k])
+        v_seg.append(v[k])
+        pts_ref.append(pts_run[k])
 
-    p_g = list(map(get_gps_pt, t_g, t_pick, v_pick, p_pick))
-    dist_run = path_distance(p_t)
-    dist_gps = path_distance(p_g)
+    pts_gps = list(map(get_gps_pt, t_g, t_run_ref, v_seg, pts_ref))
+    dist_run = path_distance(pts_run)
+    dist_gps = path_distance(pts_gps)
     err_percent = (1-dist_gps/dist_run)*100
     return err_percent
 
 
 def main():
-    # INPUT READ
-    ip_phrase = []
-    n = None
-    for line in sys.stdin:
-        ip_num = [int(i) for i in line.split(' ')[0:]]
-        ip_phrase.append(ip_num)
-        if not n:
-            n = ip_num[0]
-            l = 0
-        l += 1
-        if l > n:
-            break
-
-
-    # ip_phrase = [[6, 2], [0, 0, 0], [0, 3, 3], [-2, 5, 5], [0, 7, 7], [2, 5, 9], [0, 3, 11]]
-    # ip_phrase = [[5, 2], [0, 0, 0], [0, 3, 3], [0, 0, 6], [0, 3, 9], [0, 0, 12]]  # Back and forth 2 laps
-    # ip = [[2, 2], [0, 0, 0], [0, 20, 10]]  # 1 sprint
-    # ip = [[5, 4], [0, 0, 0], [1, 1, 1], [2, 0, 2], [3, 1, 3], [4, 0, 4]]  # Back and forth 2 laps
-    # ip_phrase = ip
-
-    p_t, dg, n = parse_ip(ip_phrase)  # each recording is a tuple (xi, yi, ti)
-
-    t_g = [i for i in range(0, p_t[-1][-1], dg)]  # GPS time stamps, start at 0 and ...
-    t_g.append(p_t[-1][-1])  # end with last t
-
-    E_percent = gps_error(p_t, t_g)
-    print(E_percent)
-    return 0
+    T_gps, p_t = get_input()
+    print(gps_error(p_t, T_gps))
 
 
 if __name__ == "__main__":
