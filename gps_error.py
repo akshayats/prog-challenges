@@ -69,24 +69,24 @@ def gps_error(p_t, t_g):
 
 def main():
     # INPUT READ
-    # ip_phrase = []
-    # n = None
-    # for line in sys.stdin:
-    #     ip_num = [int(i) for i in line.split(' ')[0:]]
-    #     ip_phrase.append(ip_num)
-    #     if not n:
-    #         n = ip_num[0]
-    #         l = 0
-    #     l += 1
-    #     if l > n:
-    #         break
+    ip_phrase = []
+    n = None
+    for line in sys.stdin:
+        ip_num = [int(i) for i in line.split(' ')[0:]]
+        ip_phrase.append(ip_num)
+        if not n:
+            n = ip_num[0]
+            l = 0
+        l += 1
+        if l > n:
+            break
 
 
-    ip_phrase = [[6, 2], [0, 0, 0], [0, 3, 3], [-2, 5, 5], [0, 7, 7], [2, 5, 9], [0, 3, 11]]
-    ip_phrase = [[5, 2], [0, 0, 0], [0, 3, 3], [0, 0, 6], [0, 3, 9], [0, 0, 12]]  # Back and forth 2 laps
-    ip = [[2, 2], [0, 0, 0], [0, 20, 10]]  # 1 sprint
-    ip = [[5, 4], [0, 0, 0], [1, 1, 1], [2, 0, 2], [3, 1, 3], [4, 0, 4]]  # Back and forth 2 laps
-    ip_phrase = ip
+    # ip_phrase = [[6, 2], [0, 0, 0], [0, 3, 3], [-2, 5, 5], [0, 7, 7], [2, 5, 9], [0, 3, 11]]
+    # ip_phrase = [[5, 2], [0, 0, 0], [0, 3, 3], [0, 0, 6], [0, 3, 9], [0, 0, 12]]  # Back and forth 2 laps
+    # ip = [[2, 2], [0, 0, 0], [0, 20, 10]]  # 1 sprint
+    # ip = [[5, 4], [0, 0, 0], [1, 1, 1], [2, 0, 2], [3, 1, 3], [4, 0, 4]]  # Back and forth 2 laps
+    # ip_phrase = ip
 
     p_t, dg, n = parse_ip(ip_phrase)  # each recording is a tuple (xi, yi, ti)
 
