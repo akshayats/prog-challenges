@@ -109,12 +109,17 @@ def gps_error(p_t, t_g):
 
 def main():
     ip_phrase = []
-    for ip_line in sys.stdin:
-        if 'done' in ip_line.lower():
+    n = None
+    for line in sys.stdin:
+        ip_num = [int(i) for i in line.split(' ')[0:]]
+        ip_phrase.append(ip_num)
+        if not n:
+            n = ip_num[0]
+            l = 0
+        l += 1
+        if l > n:
             break
-        else:
-            ip_num = [int(i) for i in ip_line.split(' ')[0:]]
-            ip_phrase.append(ip_num)
+
 
     # ip_phrase = [[6, 2], [0, 0, 0], [0, 3, 3], [-2, 5, 5], [0, 7, 7], [2, 5, 9], [0, 3, 11]]
 
