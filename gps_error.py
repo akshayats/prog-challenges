@@ -25,8 +25,9 @@ def parse_ip(ip):
 
 def velocity(a, b):
     dt = float(b[2] - a[2])
-    v = tuple([(b[0]-a[0])/dt, (b[1]-a[1])/dt])
+    v = tuple([(b[0] - a[0]) / dt, (b[1] - a[1]) / dt])
     return v
+
 
 # def get_gps_pts(dg, v, p, r):
 #     pts = []
@@ -35,14 +36,13 @@ def velocity(a, b):
 #         pts.append(tuple(q))
 #     return pts
 
-def get_gps_pt():
-
-    # dg = t_g - t[r]  # delta between gps and most recent t
+def get_gps_pt(tg, t, vg, p0):
+    dg = float(tg - t)  # delta between gps and most recent t
     # vg = v[r, :]  # relevant velocity vector
     # p0 = np.array(p)[r, :]  # relevant local origin
-    # q = p0 + vg * dg[:, np.newaxis]  # GPS point recorded
-    p_g = (0, 0, 0)
+    p_g = tuple([p0[0] + vg[0] * dg, p0[1] + vg[1] * dg, tg])  # GPS point recorded
     return p_g
+
 
 def path_distance(p):
     q = np.diff(p, axis=0)
@@ -52,17 +52,24 @@ def path_distance(p):
 
 def gps_error(p_t, t_g):
     v = list(map(velocity, p_t[:-1], p_t[1:]))  # ds/dt
-    v = v.append((0, 0))  # Stop velocity
-    
+    v.append((0, 0))  # Stop velocity at last point
+
     # Which velocity vector for each t_g
     t = [i[2] for i in p_t]  # Actual time stamps
-    r = [len(t)-1-[i >= j for j in t[::-1]].index(True) for i in t_g]
+    r = [len(t) - 1 - [i >= j for j in t[::-1]].index(True) for i in t_g]
 
     # Find points at GPS times
+    ans = get_gps_pt(t_g[2], t[r[2]], v[r[2]], p_t[r[2]])
     # dg = t_g - t[r]  # delta between gps and most recent t
     # vg = v[r, :]  # relevant velocity vector
     # p0 = np.array(p)[r, :]  # relevant local origin
     # q = p0 + vg * dg[:, np.newaxis]  # GPS point recorded
+    print(ans)
+    print(t_g)
+    print(r)
+    print(t)
+    print(v)
+    print(p_t)
     return 0
     #
     # # Percentage distance error
