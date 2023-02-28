@@ -29,17 +29,15 @@ def velocity(a, b):
     return v
 
 
-# def get_gps_pts(dg, v, p, r):
+# def get_gps_pts(dg, v, p, anchor_idxs):
 #     pts = []
-#     for i, dt, pp in zip(r, dg, np.array(p)[r, :]):
+#     for i, dt, pp in zip(anchor_idxs, dg, np.array(p)[anchor_idxs, :]):
 #         q = dt * v[i] + pp
 #         pts.append(tuple(q))
 #     return pts
 
 def get_gps_pt(tg, t, vg, p0):
     dg = float(tg - t)  # delta between gps and most recent t
-    # vg = v[r, :]  # relevant velocity vector
-    # p0 = np.array(p)[r, :]  # relevant local origin
     p_g = tuple([p0[0] + vg[0] * dg, p0[1] + vg[1] * dg, tg])  # GPS point recorded
     return p_g
 
@@ -56,20 +54,31 @@ def gps_error(p_t, t_g):
 
     # Which velocity vector for each t_g
     t = [i[2] for i in p_t]  # Actual time stamps
-    r = [len(t) - 1 - [i >= j for j in t[::-1]].index(True) for i in t_g]
+    anchor_idxs = [len(t) - 1 - [i >= j for j in t[::-1]].index(True) for i in t_g]
 
     # Find points at GPS times
-    ans = get_gps_pt(t_g[2], t[r[2]], v[r[2]], p_t[r[2]])
-    # dg = t_g - t[r]  # delta between gps and most recent t
-    # vg = v[r, :]  # relevant velocity vector
-    # p0 = np.array(p)[r, :]  # relevant local origin
+    a = get_gps_pt(t_g[2], t[anchor_idxs[2]], v[anchor_idxs[2]], p_t[anchor_idxs[2]])
+
+    t_pick = []
+    v_pick = []
+    p_pick = []
+    for k in anchor_idxs:
+        t_pick.append(t[k])
+        v_pick.append(v[k])
+        p_pick.append(p_t[k])
+
+    ans = list(map(get_gps_pt, t_g, t_pick, v_pick, p_pick))
+    # dg = t_g - t[anchor_idxs]  # delta between gps and most recent t
+    # vg = v[anchor_idxs, :]  # relevant velocity vector
+    # p0 = np.array(p)[anchor_idxs, :]  # relevant local origin
     # q = p0 + vg * dg[:, np.newaxis]  # GPS point recorded
-    print(ans)
     print(t_g)
-    print(r)
+    print(anchor_idxs)
     print(t)
     print(v)
     print(p_t)
+    print('---')
+    print(ans)
     return 0
     #
     # # Percentage distance error
