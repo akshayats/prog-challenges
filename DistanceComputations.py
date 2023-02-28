@@ -58,22 +58,30 @@ def gps_error(p, t, g):
     # Percentage distance error
     dist_run = path_distance(np.array(p))  # Actual path distance
     dist_gps = path_distance(q)  # GPS path distance
+
+    print(dist_run)
+    print(dist_gps)
     err_percent = (1 - dist_gps / dist_run) * 100
     # print("Percentage error in distance by GPS = {}%".format(err))
     return err_percent
 
 
 def main():
-    ip = [[6, 2], [0, 0, 0], [0, 3, 3,], [-2, 5, 5], [0, 7, 7], [2, 5, 9], [0, 3, 11]]
+    ip = [[6, 2], [0, 0, 0], [0, 3, 3], [-2, 5, 5], [0, 7, 7], [2, 5, 9], [0, 3, 11]]  # Given test case
+    ip = [[5, 2], [0, 0, 0], [0, 3, 3], [0, 0, 6], [0, 3, 9], [0, 0, 12]]  # Back and forth 2 laps
+    ip = [[2, 2], [0, 0, 0], [0, 20, 10]]  # 1 sprint
+    ip = [[5, 4], [0, 0, 0], [1, 1, 1], [2, 0, 2], [3, 1, 3], [4, 0, 4]]  # Back and forth 2 laps
+
+
     p, t, dg, n = parse_ip(ip)
     # p = [(0, 0), (1, 1), (4, 7), (6, 10), (5, 7), (3, -1), (0, -4), (-2, -1), (-3, 2), (2, 5), (-1, 13)]
     # t = np.arange(0, 32, 3)
     g = np.append(np.arange(0, t[-1], dg), t[-1])  # GPS time stamps, start at 0 and end with last t
+    print(g)
     # print(g)
     E_percent = gps_error(p, t, g)
     # stdout
-    print(E_percent)
-    return 0
+    print("Error percent = {}".format(E_percent))
 
 
 if __name__ == "__main__":

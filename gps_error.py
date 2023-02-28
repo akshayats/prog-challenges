@@ -50,7 +50,7 @@ def gps_error(p_t, t_g):
     anchor_idxs = [len(t) - 1 - [i >= j for j in t[::-1]].index(True) for i in t_g]
 
     # Find points at GPS times
-    a = get_gps_pt(t_g[2], t[anchor_idxs[2]], v[anchor_idxs[2]], p_t[anchor_idxs[2]])
+    # a = get_gps_pt(t_g[2], t[anchor_idxs[2]], v[anchor_idxs[2]], p_t[anchor_idxs[2]])
 
     t_pick = []
     v_pick = []
@@ -68,6 +68,7 @@ def gps_error(p_t, t_g):
 
 
 def main():
+    # INPUT READ
     # ip_phrase = []
     # n = None
     # for line in sys.stdin:
@@ -82,9 +83,10 @@ def main():
 
 
     ip_phrase = [[6, 2], [0, 0, 0], [0, 3, 3], [-2, 5, 5], [0, 7, 7], [2, 5, 9], [0, 3, 11]]
-
-    # p = [(0, 0), (1, 1), (4, 7), (6, 10), (5, 7), (3, -1), (0, -4), (-2, -1), (-3, 2), (2, 5), (-1, 13)]
-    # t = np.arange(0, 32, 3)
+    ip_phrase = [[5, 2], [0, 0, 0], [0, 3, 3], [0, 0, 6], [0, 3, 9], [0, 0, 12]]  # Back and forth 2 laps
+    ip = [[2, 2], [0, 0, 0], [0, 20, 10]]  # 1 sprint
+    ip = [[5, 4], [0, 0, 0], [1, 1, 1], [2, 0, 2], [3, 1, 3], [4, 0, 4]]  # Back and forth 2 laps
+    ip_phrase = ip
 
     p_t, dg, n = parse_ip(ip_phrase)  # each recording is a tuple (xi, yi, ti)
 
