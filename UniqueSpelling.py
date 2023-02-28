@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
 import sys
 
-print("Hello World")
-# for line in sys.stdin:
-word = 'nonoo o'
-
-a = word
-b = word[1:]+word[-1]
-# ans = list(a) list(b)
-ans = [j for i, j in zip(a, b) if i != j]
-ans = ''.join([word[0]]+ans)
-print(ans)
+for word in sys.stdin:
+    word_shift = word[1:]+word[-1]  # Word shifted by 1 char, pad with last char
+    ans = [j for j, i in zip(word_shift, word) if j != i]  # Look back 1 char
+    ans = ''.join([word[0]]+ans)  # first char
+    print(ans)

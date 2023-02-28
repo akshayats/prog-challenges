@@ -1,4 +1,6 @@
-import matplotlib.pyplot as plt
+#!/usr/bin/env python3
+
+import sys
 import numpy as np
 
 
@@ -48,13 +50,6 @@ def gps_error(p, t, g):
     p0 = np.array(p)[r, :]  # relevant local origin
     q = p0 + vg * dg[:, np.newaxis]  # GPS point recorded
 
-    # Visualise the path
-    x, y = zip(*p)
-    plt.plot(x, y, 'o-')
-    plt.plot(q[:, 0], q[:, 1], '.-')
-    plt.grid('on')
-    plt.show()
-
     # Percentage distance error
     dist_run = path_distance(np.array(p))  # Actual path distance
     dist_gps = path_distance(q)  # GPS path distance
@@ -64,8 +59,16 @@ def gps_error(p, t, g):
 
 
 def main():
-    ip = [[6, 2], [0, 0, 0], [0, 3, 3,], [-2, 5, 5], [0, 7, 7], [2, 5, 9], [0, 3, 11]]
-    p, t, dg, n = parse_ip(ip)
+    ip_phrase = []
+    for ip_line in sys.stdin:
+        if 'done' in ip_line.lower():
+            break
+        else:
+            ip_num = [int(i) for i in ip_line.split(' ')[0:]]
+            ip_phrase.append(ip_num)
+
+    # ip = [[6, 2], [0, 0, 0], [0, 3, 3,], [-2, 5, 5], [0, 7, 7], [2, 5, 9], [0, 3, 11]]
+    p, t, dg, n = parse_ip(ip_phrase)
     # p = [(0, 0), (1, 1), (4, 7), (6, 10), (5, 7), (3, -1), (0, -4), (-2, -1), (-3, 2), (2, 5), (-1, 13)]
     # t = np.arange(0, 32, 3)
     g = np.append(np.arange(0, t[-1], dg), t[-1])  # GPS time stamps, start at 0 and end with last t
